@@ -1,1 +1,6 @@
-.netbeans_automatic_build
+org\koff\emotiv\gui\Application.class
+org\koff\emotiv\gui\Application$1.class
+org\koff\emotiv\gui\Application$2.class
+org\koff\emotiv\gui\Application$3.class
+org\koff\emotiv\gui\chart\BandChart.class
+org\koff\emotiv\gui\chart\ChartSwingWorker.class

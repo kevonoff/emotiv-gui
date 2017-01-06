@@ -5,6 +5,7 @@
  */
 package org.koff.emotiv.gui.chart;
 
+import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.SwingWorker;
 import org.knowm.xchart.QuickChart;
@@ -30,7 +31,8 @@ public class BandChart {
         chart.getStyler().setLegendVisible(false);
         chart.getStyler().setAxisTitlesVisible(false);
         chart.getStyler().setChartTitleVisible(false);
-        
+        chart.getStyler().setXAxisTicksVisible(false);
+        chart.getStyler().setYAxisMax(100d);
         panel = new XChartPanel(chart);
         panel.setAlignmentX(0f);
     }
@@ -45,7 +47,7 @@ public class BandChart {
         return panel;
     }
     
-    public void updateChart(double[] yData){
+    public void updateChart(List<Double> yData){
         
         chart.updateXYSeries(chartName, null, yData, null);
         panel.revalidate();

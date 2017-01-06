@@ -8,6 +8,8 @@ package org.koff.emotiv.core.wrapper;
 import org.koff.emotiv.core.*;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.*;
+import java.util.List;
+import java.util.Map;
 import org.koff.emotiv.core.Edk;
 import org.koff.emotiv.core.EdkErrorCode;
 
@@ -22,11 +24,11 @@ public class EmotivWrapper {
     private static final String[] BAND_NAMES = {"Theta", "Alpha", "Low Beta", "High Beta", "Gamma"};
     
     private static final Edk.IEE_DataChannels_t[] CHANNEL_LIST = {
-        Edk.IEE_DataChannels_t.IED_AF3,
-        Edk.IEE_DataChannels_t.IED_AF4,
-        Edk.IEE_DataChannels_t.IED_T7,
-        Edk.IEE_DataChannels_t.IED_T8,
-        Edk.IEE_DataChannels_t.IED_Pz
+        Edk.IEE_DataChannels_t.IED_AF3, //front left
+        Edk.IEE_DataChannels_t.IED_AF4, //front right
+        Edk.IEE_DataChannels_t.IED_T7,  //left ear
+        Edk.IEE_DataChannels_t.IED_T8,  //right ear
+        Edk.IEE_DataChannels_t.IED_Pz   //top
     };
     
     public EmotivWrapper(){
@@ -45,6 +47,14 @@ public class EmotivWrapper {
     
     public void disconnect(){
         Edk.INSTANCE.IEE_EngineDisconnect();
+    }
+    
+    public List<Map<String, Double>> getBandPowersForAllChannels(){
+        return BandPower.getAllBandPowers(Edk.INSTANCE);
+    }
+    
+    public List<Map<String, Double>> getBandPowersForAllChannelsFake(){
+        return BandPower.getAllBandPowersFake();
     }
     
     public static String[] getBandNames(){

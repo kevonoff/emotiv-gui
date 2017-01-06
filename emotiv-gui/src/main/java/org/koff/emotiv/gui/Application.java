@@ -5,13 +5,16 @@
  */
 package org.koff.emotiv.gui;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import org.koff.emotiv.core.wrapper.EmotivWrapper;
 import org.koff.emotiv.gui.chart.BandChart;
+import org.koff.emotiv.gui.chart.ChartSwingWorker;
 
 /**
  *
@@ -20,7 +23,8 @@ import org.koff.emotiv.gui.chart.BandChart;
 public class Application extends javax.swing.JFrame {
 
     private final Map<String, BandChart> charts = new HashMap<>();
-    double[] fake = new double[100];
+    private ChartSwingWorker worker;
+    private EmotivWrapper wrapper;
     /**
      * Creates new form Application
      */
@@ -28,6 +32,8 @@ public class Application extends javax.swing.JFrame {
         initComponents();
         tabPowerBands.setLayout(new BoxLayout(tabPowerBands, BoxLayout.Y_AXIS));
         setup();
+        wrapper = new EmotivWrapper();
+        worker = new ChartSwingWorker(wrapper, charts);
     }
 
     private void setup(){
@@ -39,12 +45,12 @@ public class Application extends javax.swing.JFrame {
             charts.put(bandName, chart);
         }
         tabPowerBands.revalidate();
-        for(int i = 0; i < 100; i++){
-            fake[i] = Math.random() * 100;
-            for(String bandName : EmotivWrapper.getBandNames()){
-                charts.get(bandName).updateChart(fake);
-            }
-        }
+//        for(int i = 0; i < 100; i++){
+//            fake.add(Math.random() * 100);
+//            for(String bandName : EmotivWrapper.getBandNames()){
+//                charts.get(bandName).updateChart(fake);
+//            }
+//        }
         
         
     }
@@ -145,21 +151,12 @@ public class Application extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnDisconnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDisconnectActionPerformed
-        
+        worker.cancel(true);
     }//GEN-LAST:event_btnDisconnectActionPerformed
 
     private void btnConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConnectActionPerformed
 
-        double[] fake = new double[100];
-        
-        for(String bandName : EmotivWrapper.getBandNames()){
-            
-        }
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        worker.execute();
         
     }//GEN-LAST:event_btnConnectActionPerformed
 

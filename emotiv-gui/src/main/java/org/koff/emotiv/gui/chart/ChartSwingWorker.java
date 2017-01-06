@@ -5,15 +5,11 @@
  */
 package org.koff.emotiv.gui.chart;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import javax.swing.Box;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import org.knowm.xchart.QuickChart;
-import org.knowm.xchart.SwingWrapper;
-import org.knowm.xchart.XChartPanel;
-import org.knowm.xchart.XYChart;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import javax.swing.SwingWorker;
 import org.koff.emotiv.core.wrapper.EmotivWrapper;
 
 
@@ -22,50 +18,69 @@ import org.koff.emotiv.core.wrapper.EmotivWrapper;
  *
  * @author kevin.off
  */
-public class ChartSwingWorker {
+public class ChartSwingWorker extends SwingWorker<Boolean, Map<String, List<Double>>>{
 
-    SwingWrapper<XYChart> sw;
-    double phase = 0;
+    private final EmotivWrapper emotiv;
+    private final Map<String, BandChart> charts;
+    private Map<String, LinkedList<Double>> data;
     
-    public void show(JPanel panel) {
+    public ChartSwingWorker(EmotivWrapper wrapper, Map<String, BandChart> charts){
+        this.emotiv = wrapper;
+        this.charts = charts;
+        initializeData();
+    }
+
+    @Override
+    protected Boolean doInBackground() throws Exception {
         
+        while(!isCancelled()){
         
-        for(String band : EmotivWrapper.getBandNames()){
-            addNewChart(panel, band);
+            List<Map<String, Double>> powers = emotiv.getBandPowersForAllChannelsFake();
+
+            Map<String, List<Double>> newData = new HashMap<>();
+            
+            Map<String, Double> frontLeft = powers.get(0);
+            Map<String, Double> frontRight = powers.get(1);
+
+            Double newValue;
+            for(String bandName : EmotivWrapper.getBandNames()){
+                
+                newValue = (frontLeft.get(bandName) + frontRight.get(bandName)) / 2;
+                data.get(bandName).add(newValue);
+                data.get(bandName).removeFirst();
+                newData.put(bandName, data.get(bandName));
+                
+            }
+
+            publish(newData);
+            
+            Thread.sleep(500);
+        }
+        return true;
+    }
+    
+    @Override
+    protected void process(List<Map<String, List<Double>>> chunks) {
+        
+        Map<String, List<Double>> newData = chunks.get(chunks.size() - 1);
+        BandChart chart;
+        for(String bandName : newData.keySet()){
+            chart = charts.get(bandName);
+            chart.updateChart(newData.get(bandName));
+        }
+        
+    }
+    
+    private void initializeData(){
+        data = new HashMap<>();
+        LinkedList<Double> allZeros;
+        
+        for(String bandName : EmotivWrapper.getBandNames()){
+            allZeros = new LinkedList<>();
+            for(int i = 0; i < 100; i++){
+                allZeros.add(0d);
+            }
+            data.put(bandName, allZeros);
         }
     }
-    
-    
-
-    private static double[][] getSineData(double phase) {
-
-        double[] xData = new double[100];
-        double[] yData = new double[100];
-        for (int i = 0; i < xData.length; i++) {
-            double radians = phase + (2 * Math.PI / xData.length * i);
-            xData[i] = radians;
-            yData[i] = Math.sin(radians);
-        }
-        return new double[][]{xData, yData};
-    }
-
-    private void addNewChart(JPanel parent, String name){
-        double[][] initdata = getSineData(phase);
-        // Create Chart
-        XYChart chart = QuickChart.getChart("title", "x", "y", name, initdata[0], initdata[1]);
-        chart.getStyler().setLegendVisible(false);
-        chart.getStyler().setAxisTitlesVisible(false);
-        chart.getStyler().setChartTitleVisible(false);
-        
-        XChartPanel chartPanel = new XChartPanel(chart);
-        chartPanel.setAlignmentX(0f);
-        
-        JLabel label = new JLabel(name, JLabel.LEFT);
-        label.setAlignmentX(0f);
-        
-        parent.add(label);
-        parent.add(chartPanel);
-        parent.revalidate();
-    }
-    
 }
