@@ -5,13 +5,13 @@
  */
 package org.koff.emotiv.core.wrapper;
 
-import org.koff.emotiv.core.*;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.*;
 import java.util.List;
 import java.util.Map;
 import org.koff.emotiv.core.Edk;
 import org.koff.emotiv.core.EdkErrorCode;
+import org.koff.emotiv.core.EmoState;
 
 /**
  *
@@ -55,6 +55,13 @@ public class EmotivWrapper {
     
     public List<Map<String, Double>> getBandPowersForAllChannelsFake(){
         return BandPower.getAllBandPowersFake();
+    }
+    
+    public List<Double> getContactQualities(){
+        Pointer stuff = new Pointer(0);
+        
+        
+        EmoState.INSTANCE.IS_GetContactQualityFromAllChannels(Pointer.NULL, userId, 0);
     }
     
     public static String[] getBandNames(){
