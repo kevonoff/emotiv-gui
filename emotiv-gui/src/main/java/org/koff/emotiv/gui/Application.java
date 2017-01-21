@@ -5,10 +5,11 @@
  */
 package org.koff.emotiv.gui;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BoxLayout;
@@ -25,6 +26,7 @@ public class Application extends javax.swing.JFrame {
     private final Map<String, BandChart> charts = new HashMap<>();
     private ChartSwingWorker worker;
     private EmotivWrapper wrapper;
+    private ExecutorService executor;
     /**
      * Creates new form Application
      */
@@ -32,6 +34,7 @@ public class Application extends javax.swing.JFrame {
         initComponents();
         tabPowerBands.setLayout(new BoxLayout(tabPowerBands, BoxLayout.Y_AXIS));
         setup();
+        executor = Executors.newSingleThreadExecutor();
         wrapper = new EmotivWrapper();
         worker = new ChartSwingWorker(wrapper, charts);
     }
@@ -156,7 +159,20 @@ public class Application extends javax.swing.JFrame {
 
     private void btnConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConnectActionPerformed
 
+        
+        
         worker.execute();
+        executor.submit(()->{
+            
+            try {
+                worker.get();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ExecutionException ex) {
+                Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        
+        });
         
     }//GEN-LAST:event_btnConnectActionPerformed
 

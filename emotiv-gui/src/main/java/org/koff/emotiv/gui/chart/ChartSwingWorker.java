@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import javax.swing.SwingWorker;
 import org.koff.emotiv.core.wrapper.EmotivWrapper;
 
@@ -35,7 +36,11 @@ public class ChartSwingWorker extends SwingWorker<Boolean, Map<String, List<Doub
         
         while(!isCancelled()){
         
-            List<Map<String, Double>> powers = emotiv.getBandPowersForAllChannelsFake();
+            if (!EmotivWrapper.test){
+                emotiv.connectToHeadset();
+            }
+            
+            List<Map<String, Double>> powers = emotiv.getBandPowersForAllChannels();
 
             Map<String, List<Double>> newData = new HashMap<>();
             

@@ -20,7 +20,7 @@ public class Emotion {
 		Pointer eState = Edk.INSTANCE.IEE_EmoStateCreate();
 		IntByReference userID = null;
 		short composerPort = 1726;
-		int option = 2;
+		int option = 1;
 		int state = 0;
 
 		userID = new IntByReference(0);
@@ -87,7 +87,6 @@ public class Emotion {
 					System.out.print("CurrentActionPower: ");
 					System.out.println(EmoState.INSTANCE
 							.IS_MentalCommandGetCurrentActionPower(eState));
-                                        System.out.print("Upperface: ");
                                        
 				}
 			} else if (state != EdkErrorCode.EDK_NO_EVENT.ToInt()) {
